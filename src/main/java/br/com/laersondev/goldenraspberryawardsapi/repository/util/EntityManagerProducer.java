@@ -1,6 +1,7 @@
 package br.com.laersondev.goldenraspberryawardsapi.repository.util;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
@@ -18,6 +19,7 @@ public class EntityManagerProducer {
 	}
 
 	@Produces
+	@RequestScoped
 	public EntityManager produce() {
 		return this.entityManagerFactory.createEntityManager();
 	}

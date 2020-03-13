@@ -1,4 +1,4 @@
-package br.com.laersondev.goldenraspberryawardsapi.rest.api;
+package br.com.laersondev.goldenraspberryawardsapi.rest.util;
 
 import java.io.Serializable;
 

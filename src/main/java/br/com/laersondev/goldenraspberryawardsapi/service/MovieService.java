@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -19,6 +20,7 @@ import br.com.laersondev.goldenraspberryawardsapi.service.exception.ServiceExcep
  * MovieService
  */
 @Named
+@RequestScoped
 public class MovieService {
 
 	protected MovieService() {
@@ -28,18 +30,32 @@ public class MovieService {
 	@Inject
 	private MovieRepository repository;
 
-	public void delete(final int movieId) {
-		this.tryRun(this.repository::deleteById, movieId);
+	public Movie delete(final int movieId) {
+		return this.tryDo(movId -> {
+			final Movie movie = getByIdObrigatorio(movieId);
+			this.repository.deleteById(movId);
+			//this.repository.flush();
+			return movie;
+		}, movieId);
 	}
 
 	public Movie create(final MovieDto movieDto) {
 		return this.tryDo((dto) -> this.repository.save(newFrom(dto)), movieDto);
 	}
 
+	public Optional<Movie> getById(final int id) {
+		return this.tryDo(this.repository::findById, id);
+	}
+
+	public Movie getByIdObrigatorio(final int id) {
+		return this.getById(id)
+				.orElseThrow(() -> new MovieNotFoundException(id));
+	}
+
+
 	public Movie update(final MovieDto movieDto) {
 		return this.tryDo((final MovieDto dto) -> {
-			final Movie movieToUpdate = this.getById(dto.getId())
-					.orElseThrow(() -> new MovieNotFoundException(dto.getId()));
+			final Movie movieToUpdate = this.getByIdObrigatorio(dto.getId());
 			movieToUpdate.updateFrom(dto);
 			return this.repository.save(movieToUpdate);
 		}, movieDto);
@@ -61,8 +77,5 @@ public class MovieService {
 		}
 	}
 
-	public Optional<Movie> getById(final int id) {
-		return this.tryDo(this.repository::findById, id);
-	}
 
 }

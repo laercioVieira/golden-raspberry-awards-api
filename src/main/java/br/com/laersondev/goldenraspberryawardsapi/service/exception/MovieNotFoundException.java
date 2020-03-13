@@ -2,7 +2,9 @@ package br.com.laersondev.goldenraspberryawardsapi.service.exception;
 
 import java.text.MessageFormat;
 
-public class MovieNotFoundException extends ServiceException {
+import br.com.laersondev.goldenraspberryawardsapi.rest.util.ObjectNotFoundException;
+
+public class MovieNotFoundException extends ObjectNotFoundException{
 
 	private static final long serialVersionUID = 1L;
 	private static final String MOVIE_WITH_ID_NOT_FOUND = "Movie with id: {0} not found.";
