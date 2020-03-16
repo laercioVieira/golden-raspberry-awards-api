@@ -2,7 +2,10 @@ package br.com.laersondev.goldenraspberryawardsapi.dto;
 
 import java.io.Serializable;
 
-public class ProducerWinInfo implements Serializable {
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
+@Schema(name = "ProducerAwardDetail")
+public class ProducerAwardDetail implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -11,11 +14,11 @@ public class ProducerWinInfo implements Serializable {
 	private Integer previousWin;
 	private Integer followingWin;
 
-	protected ProducerWinInfo() {
+	protected ProducerAwardDetail() {
 		super();
 	}
 
-	public ProducerWinInfo(String producer, int interval, Integer previousWin, Integer followingWin) {
+	public ProducerAwardDetail(String producer, int interval, Integer previousWin, Integer followingWin) {
 		super();
 		this.producer = producer;
 		this.interval = interval;
@@ -41,7 +44,7 @@ public class ProducerWinInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ProducerWinInfo [producer=" + this.producer + ", interval=" + this.interval + ", previousWin=" + this.previousWin
+		return "ProducerAwardDetail [producer=" + this.producer + ", interval=" + this.interval + ", previousWin=" + this.previousWin
 				+ ", followingWin=" + this.followingWin + "]";
 	}
 

@@ -1,15 +1,23 @@
 package br.com.laersondev.goldenraspberryawardsapi.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+import static br.com.laersondev.goldenraspberryawardsapi.util.Precondition.checkIfNotNull;
+import static java.util.stream.Collectors.toSet;
 
-import javax.enterprise.context.RequestScoped;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import br.com.laersondev.goldenraspberryawardsapi.dto.ProducerWinInfo;
-import br.com.laersondev.goldenraspberryawardsapi.dto.ProducerWinInterval;
+import br.com.laersondev.goldenraspberryawardsapi.dto.ProducerAwardDetail;
+import br.com.laersondev.goldenraspberryawardsapi.dto.RangeProducerAwards;
+import br.com.laersondev.goldenraspberryawardsapi.model.Producer;
 import br.com.laersondev.goldenraspberryawardsapi.repository.ProducerRepository;
 import br.com.laersondev.goldenraspberryawardsapi.repository.dto.ProducerMovieWinRs;
 import br.com.laersondev.goldenraspberryawardsapi.service.exception.ServiceException;
@@ -18,7 +26,6 @@ import br.com.laersondev.goldenraspberryawardsapi.service.exception.ServiceExcep
  * ProducerService
  */
 @Named
-@RequestScoped
 public class ProducerService {
 
 	@Inject
@@ -28,42 +35,58 @@ public class ProducerService {
 		super();
 	}
 
-	public ProducerWinInterval getProducerWinInterval() {
+	public Set<Producer> findOrCreate(Set<String> producers) {
+		return checkIfNotNull(producers, "producers").stream()//
+				.map(producer -> this.repository.findByName(producer)//
+						.orElseGet(() -> this.repository.save(new Producer(producer))))
+				.collect(toSet());
+	}
 
+	public RangeProducerAwards getRangeProducerAwards() {
 		final List<ProducerMovieWinRs> winMoviesAtLeastTwice = this.repository.findProducersWithWinMoviesAtLeastTwice();
+		final List<ProducerAwardDetail> producerAwardsDts = makeProducersAwardsDetailsWithInterval(winMoviesAtLeastTwice);
 
-		ProducerWinInfo producerWinInfo = null;
-		ProducerWinInfo producerWinInfoAnterior = null;
+		final Comparator<ProducerAwardDetail> compareByInterval = Comparator.comparingInt(ProducerAwardDetail::getInterval);
+		final Predicate<? super ProducerAwardDetail> intervalGreaterThanZero = prodToFilter -> prodToFilter.getInterval() > 0;
+		final Optional<ProducerAwardDetail> min = producerAwardsDts.stream().filter(intervalGreaterThanZero).min(compareByInterval);
+		final Optional<ProducerAwardDetail> max = producerAwardsDts.stream().filter(intervalGreaterThanZero).max(compareByInterval);
 
-		final List<ProducerWinInfo> producerWinn = new ArrayList<>();
+		final RangeProducerAwards rangeProducerAwards = new RangeProducerAwards();
+		min.ifPresent(minProducer -> {//
+			rangeProducerAwards.getMin().addAll(producerWihSameInterval(producerAwardsDts, minProducer).collect(toSet()));
+		});
+		max.ifPresent(maxProducer -> {//
+			rangeProducerAwards.getMax().addAll(producerWihSameInterval(producerAwardsDts, maxProducer).collect(toSet()));
+		});
 
+		return rangeProducerAwards;
+	}
+
+	private List<ProducerAwardDetail> makeProducersAwardsDetailsWithInterval(
+			final List<ProducerMovieWinRs> winMoviesAtLeastTwice) {
+		ProducerAwardDetail producerAwardDetail = null;
+		ProducerAwardDetail producerAwardDetailBefore = null;
+
+		final List<ProducerAwardDetail> producerWinn = new ArrayList<>(0);
 		for (final ProducerMovieWinRs producerMovieWinRs : winMoviesAtLeastTwice) {
-			producerWinInfo = new ProducerWinInfo(producerMovieWinRs.getProducerName(), 0, null, producerMovieWinRs.getMovieYear());
-			if(producerWinInfoAnterior != null) {
-				producerWinInfo = new ProducerWinInfo(producerMovieWinRs.getProducerName(), //
-						(producerMovieWinRs.getMovieYear() - producerWinInfoAnterior.getFollowingWin()),//
-						producerWinInfoAnterior.getFollowingWin(),//
+			if (producerAwardDetailBefore != null) {
+				producerAwardDetail = new ProducerAwardDetail(producerMovieWinRs.getProducerName(), //
+						(producerMovieWinRs.getMovieYear() - producerAwardDetailBefore.getFollowingWin()), //
+						producerAwardDetailBefore.getFollowingWin(), //
+						producerMovieWinRs.getMovieYear());
+			} else {
+				producerAwardDetail = new ProducerAwardDetail(producerMovieWinRs.getProducerName(), 0, null,
 						producerMovieWinRs.getMovieYear());
 			}
-			producerWinInfoAnterior = producerWinInfo;
-			producerWinn.add(producerWinInfo);
+			producerAwardDetailBefore = producerAwardDetail;
+			producerWinn.add(producerAwardDetail);
 		}
+		return producerWinn;
+	}
 
-		//producerWinn.sort(Comparator.comparingInt(ProducerWinInfo::getInterval).reversed());
-
-		//		producerWinn.stream()
-		//		.sorted(Comparator.comparingInt(ProducerWinInfo::getInterval))
-		//		filter(prodToFilt -> prodToFilt.get)
-		//		.collect(
-		//				Collectors.groupingBy(prod -> { return prod; }, new Supplier<Map>() {
-		//
-		//				},//
-		//						Collectors.summarizingInt((ProducerWinInfo prodWin) -> {
-		//							return prodWin.getInterval();
-		//						}) //
-		//						);
-
-		return new ProducerWinInterval();
+	private Stream<ProducerAwardDetail> producerWihSameInterval(final List<ProducerAwardDetail> producerWinn,
+			ProducerAwardDetail otherProducer) {
+		return producerWinn.stream().filter( prod -> prod.getInterval() == otherProducer.getInterval() );
 	}
 
 	private <T, R> R tryDo(final Function<T, R> action, final T params) {

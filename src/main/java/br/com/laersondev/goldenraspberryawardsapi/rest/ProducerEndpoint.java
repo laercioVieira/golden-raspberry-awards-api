@@ -11,6 +11,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+
+import br.com.laersondev.goldenraspberryawardsapi.dto.RangeProducerAwards;
+import br.com.laersondev.goldenraspberryawardsapi.rest.util.ErrorResponse;
 import br.com.laersondev.goldenraspberryawardsapi.service.ProducerService;
 
 @RequestScoped
@@ -23,8 +31,18 @@ public class ProducerEndpoint {
 	private ProducerService producerService;
 
 	@GET
-	@Path("/awardsinterval")
-	public Response getInterval() {
-		return ok(this.producerService.getProducerWinInterval()).build();
+	@Path("/rangeawards")
+	@Operation( description = "Get the range of producers awards with the min and max details."
+			)
+	@APIResponses(value = {
+			@APIResponse(responseCode = "200", description = "Successfull, returning the value",
+					content= { @Content(schema=@Schema(implementation=RangeProducerAwards.class))
+			}),
+			@APIResponse(responseCode = "400", description = "Error, bad request with invalid parameters", //
+			content= { @Content(schema=@Schema(implementation=ErrorResponse.class))
+			})
+	})
+	public Response getAwardsRange() {
+		return ok(this.producerService.getRangeProducerAwards()).build();
 	}
 }

@@ -5,6 +5,9 @@ import static br.com.laersondev.goldenraspberryawardsapi.util.Precondition.check
 import static br.com.laersondev.goldenraspberryawardsapi.util.Precondition.checkIfPositive;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,12 +21,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import br.com.laersondev.goldenraspberryawardsapi.dto.MovieDto;
 
 @Entity
-@Table(name = "movie")
-public class Movie implements Serializable {
+@Table(name = "movie", uniqueConstraints=@UniqueConstraint(columnNames = {"title"}))
+public class Movie implements Serializable, br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,14 +42,14 @@ public class Movie implements Serializable {
 	@Column(name = "year")
 	private int year;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "movie_studio", joinColumns = { @JoinColumn(name = "studios_id") }, inverseJoinColumns = {
-			@JoinColumn(name = "movie_id") })
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+	@JoinTable(name = "movie_studio", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "studio_id") })
 	private Set<Studio> studios;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "movie_producer", joinColumns = { @JoinColumn(name = "producer_id") }, inverseJoinColumns = {
-			@JoinColumn(name = "movie_id") })
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+	@JoinTable(name = "movie_producer", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "producer_id") })
 	private Set<Producer> producers;
 
 	@Column(name = "winner")
@@ -53,31 +57,29 @@ public class Movie implements Serializable {
 
 	public Movie() {
 		super();
+		this.studios = new HashSet<>();
+		this.producers = new HashSet<>();
 	}
 
-	public Movie(int id, String title, int year,
-			Set<String> studios,
-			Set<String> producers, boolean winner) {
+	public Movie(int id, String title, int year, boolean winner) {
 		super();
 		this.setId(id);
 		this.setTitle(title);
 		this.setYear(year);
-		this.setStudios(checkIfNotNull(studios, "studio").stream()
-				.map(Studio::new).collect(Collectors.toSet()));
-		this.setProducers(checkIfNotNull(producers, "producers").stream()
-				.map(Producer::new).collect(Collectors.toSet()));
 		this.setWinner(winner);
+		this.studios = new HashSet<>();
+		this.producers = new HashSet<>();
 	}
 
 	public static Movie newFrom(final MovieDto movieDto) {
-		return new Movie(0, movieDto.getTitle(), movieDto.getYear(), movieDto.getStudios(), movieDto.getProducers(),
-				movieDto.getWinner());
+		return new Movie(0, movieDto.getTitle(), movieDto.getYear(), movieDto.getWinner());
 	}
 
 	/**
 	 * @return the id
 	 */
-	public int getId() {
+	@Override
+	public Integer getId() {
 		return this.id;
 	}
 
@@ -133,8 +135,8 @@ public class Movie implements Serializable {
 		return this.getStudios().stream().map(Studio::getName).collect(Collectors.toSet());
 	}
 
-	public void setStudios(Set<Studio> studios) {
-		this.studios = checkIfNotNull(studios, "studios");
+	public void addStudios(Collection<Studio> studios) {
+		this.studios.addAll(checkIfNotNull(studios, "studios"));
 	}
 
 	public Set<Producer> getProducers() {
@@ -145,8 +147,8 @@ public class Movie implements Serializable {
 		return this.getProducers().stream().map(Producer::getName).collect(Collectors.toSet());
 	}
 
-	public void setProducers(Set<Producer> producers) {
-		this.producers = checkIfNotNull(producers, "producers");
+	public void addProducers(Collection<Producer> producers) {
+		this.producers.addAll(checkIfNotNull(producers, "producers"));
 	}
 
 	public boolean getWinner() {
@@ -172,5 +174,30 @@ public class Movie implements Serializable {
 		}
 
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 5;
+		return "Movie [id=" + this.id + ", title=" + this.title + ", year=" + this.year + ", studios="
+		+ (this.studios != null ? toString(this.studios, maxLen) : null) + ", producers="
+		+ (this.producers != null ? toString(this.producers, maxLen) : null) + ", winner=" + this.winner + "]";
+	}
+
+	private String toString(Collection<?> collection, int maxLen) {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (final Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
+			if (i > 0) {
+				builder.append(", ");
+			}
+			builder.append(iterator.next());
+		}
+		if(collection.size() > maxLen) {
+			builder.append(" ...");
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 }

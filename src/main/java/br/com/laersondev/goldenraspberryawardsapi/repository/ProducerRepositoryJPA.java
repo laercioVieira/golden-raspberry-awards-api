@@ -1,30 +1,32 @@
-/*package br.com.laersondev.goldenraspberryawardsapi.repository;
+package br.com.laersondev.goldenraspberryawardsapi.repository;
 
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import java.util.Optional;
 
 import br.com.laersondev.goldenraspberryawardsapi.model.Producer;
 import br.com.laersondev.goldenraspberryawardsapi.repository.dto.ProducerMovieWinRs;
+import br.com.laersondev.goldenraspberryawardsapi.util.Precondition;
 
-public class ProducerRepositoryJPA extends SimpleJpaRepository<Producer, Integer> implements ProducerRepository {
+public class ProducerRepositoryJpa extends AbstractBaseCrudRepository<Producer, Integer> implements ProducerRepository {
 
-	@Inject private EntityManager em;
+	@Override
+	protected Class<Producer> getDomainClass() {
+		return Producer.class;
+	}
 
-	public ProducerRepositoryJPA(final EntityManager em) {
-		super(Producer.class, em);
-		this.em = em;
+	@Override
+	public Optional<Producer> findByName(String name) {
+		Precondition.checkIfNotNull(name, "name");
+		return getEntityManager().createQuery("from Producer where name = :name", Producer.class)
+				.setParameter("name", name)//
+				.getResultStream().findFirst();
 	}
 
 	@Override
 	public List<ProducerMovieWinRs> findProducersWithWinMoviesAtLeastTwice() {
-		final TypedQuery<ProducerMovieWinRs> namedQuery = this.em.createNamedQuery("findProducersWithWinMoviesAtLeastTwice", ProducerMovieWinRs.class);
-		return namedQuery.getResultList();
+		return getEntityManager() //
+				.createNamedQuery("ProducerMovieWinRs.findProducersWithWinMoviesAtLeastTwice", ProducerMovieWinRs.class)
+				.getResultList();
 	}
 
 }
- */

@@ -6,28 +6,31 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ProducerWinInterval implements Serializable {
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
+@Schema(name = "RangeProducerAwards" )
+public class RangeProducerAwards implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private Set<ProducerWinInfo> min = new HashSet<>();
-	private Set<ProducerWinInfo> max = new HashSet<>();
+	private Set<ProducerAwardDetail> min = new HashSet<>();
+	private Set<ProducerAwardDetail> max = new HashSet<>();
 
-	public ProducerWinInterval() {
+	public RangeProducerAwards() {
 		super();
 	}
 
-	public Set<ProducerWinInfo> getMin() {
+	public Set<ProducerAwardDetail> getMin() {
 		return this.min;
 	}
 
-	public Set<ProducerWinInfo> getMax() {
+	public Set<ProducerAwardDetail> getMax() {
 		return this.max;
 	}
 
 	@Override
 	public String toString() {
 		final int maxLen = 10;
-		return "WinProducersInterval [min: " + (this.min != null ? toString(this.min, maxLen) : null) + ", max: "
+		return "RangeProducerAwards [min: " + (this.min != null ? toString(this.min, maxLen) : null) + ", max: "
 		+ (this.max != null ? toString(this.max, maxLen) : null) + "]";
 	}
 

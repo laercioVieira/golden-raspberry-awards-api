@@ -1,1 +1,1 @@
-java -jar target\golden-raspberry-awards-api-thorntail.jar
+java -jar dist\golden-raspberry-awards-api-thorntail.jar

@@ -14,7 +14,8 @@ import br.com.laersondev.goldenraspberryawardsapi.util.Precondition;
 
 @Entity
 @Table(name = "producer", uniqueConstraints=@UniqueConstraint(columnNames = {"name"}))
-public class Producer implements Serializable {
+public class Producer implements Serializable,
+br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer>{
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,7 +39,8 @@ public class Producer implements Serializable {
 		this.setName(name);
 	}
 
-	public int getId() {
+	@Override
+	public Integer getId() {
 		return this.id;
 	}
 

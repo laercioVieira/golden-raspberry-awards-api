@@ -3,8 +3,11 @@ package br.com.laersondev.goldenraspberryawardsapi.dto;
 import java.io.Serializable;
 import java.util.Set;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import br.com.laersondev.goldenraspberryawardsapi.model.Movie;
 
+@Schema(name="Movie")
 public class MovieDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int id;

@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity-mappings version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
+<entity-mappings version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
+	<sql-result-set-mapping
+		name="ProducerMovieWinMapping">
+		<constructor-result 
+			target-class="br.com.laersondev.goldenraspberryawardsapi.repository.dto.ProducerMovieWinRs" >
+			<column name="name"/>
+			<column name="title"/>
+			<column name="year"/>
+		</constructor-result>
+	</sql-result-set-mapping>
 
-	<named-native-query name="findProducersWithWinMoviesAtLeastTwice" 
-		result-class="br.com.laersondev.goldenraspberryawardsapi.repository.dto.ProducerMovieWinRs" >
-		<query><![CDATA[
+	<named-native-query
+		name="ProducerMovieWinRs.findProducersWithWinMoviesAtLeastTwice"
+		result-set-mapping="ProducerMovieWinMapping" >
+		<query>
+		<![CDATA[
 			select
 				prod.name,
 				movie.title,
@@ -13,15 +27,19 @@
 					on movie_producer.producer_id = prod.id
 				join movie 
 					on movie.id = movie_producer.movie_id 
+				join (
+					select prodCount.id from producer prodCount
+					join movie_producer mpCount on mpCount.producer_id = prodCount.id
+					join movie movieCount on movieCount.id = mpCount.movie_id 
+					where movieCount.winner = true
+					group by prodCount.name
+					having count(*) >= 2
+				) ProdsWinners
+					on ProdsWinners.id = prod.id
 			where movie.winner = true
-			and exists (
-				select mp.producer_id, count(*) from movie_producer mp
-				where mp.movie_id = movie.id and mp.producer_id = prod.id
-				group by mp.producer_id
-				having count(*) >= 2
-			) 
 			group by prod.name, movie.year, movie.title
 			order by prod.name, movie.year, movie.title
+						
 		]]></query>
-	</named-native-query>	
+	</named-native-query>
 </entity-mappings>

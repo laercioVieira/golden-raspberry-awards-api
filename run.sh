@@ -1,0 +1,1 @@
+java -jar dist/golden-raspberry-awards-api-thorntail.jar
