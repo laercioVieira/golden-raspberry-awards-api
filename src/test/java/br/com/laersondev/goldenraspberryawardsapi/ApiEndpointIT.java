@@ -1,10 +1,8 @@
 package br.com.laersondev.goldenraspberryawardsapi;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -14,12 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -32,7 +30,6 @@ import org.wildfly.swarm.arquillian.DefaultDeployment;
 import br.com.laersondev.goldenraspberryawardsapi.dto.MovieDto;
 import br.com.laersondev.goldenraspberryawardsapi.dto.ProducerAwardDetail;
 import br.com.laersondev.goldenraspberryawardsapi.dto.RangeProducerAwards;
-import br.com.laersondev.goldenraspberryawardsapi.rest.util.ErrorResponse;
 
 @RunWith(Arquillian.class)
 @DefaultDeployment(type = DefaultDeployment.Type.JAR)
@@ -57,31 +54,20 @@ public class ApiEndpointIT {
 
 	private MovieDto movieCreated;
 
-	@Test
+	@Test(expected = NotFoundException.class)
 	@RunAsClient
 	public void testContexts() throws IOException {
-		final String content = this.client.target("http://localhost:8080/").request().buildGet().invoke(String.class);
-		assertThat(content, containsString("Forbidden"));
-
-		final ErrorResponse error = this.client.target(HTTP_LOCALHOST_BASE_API)//
-				.request(MediaType.APPLICATION_JSON)//
-				.buildGet().invoke(ErrorResponse.class);
-
-		assertNotNull(error);
-		assertEquals( Response.Status.BAD_REQUEST, error.getStatusCode());
-		assertThat(error.getMessage(), containsString("Could not find resource for full path: http://localhost:8080/api"));
+		this.client.target("http://localhost:8080/").request().buildGet().invoke(String.class);
 	}
 
 	@Test
 	@InSequence(value = 1)
 	public void testGetRangeProducerAwards(final @Context UriInfo uriInfo) throws IOException {
 
-		uriInfo.getBaseUri();
+		System.out.println(uriInfo.getBaseUri());
 
 		final RangeProducerAwards content = this.client.target(
-				uriInfo.getBaseUriBuilder()
-				.path("producer")
-				.path("rangeawards").build() //
+				HTTP_BASE_PATH_PRODUCER + "/rangeawards"//
 				).request().buildGet().invoke(RangeProducerAwards.class);
 
 		assertNotNull(content);
