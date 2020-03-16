@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>br.com.laersondev</groupId>
@@ -13,12 +14,9 @@
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<failOnMissingWebXml>false</failOnMissingWebXml>
-
 		<version.thorntail>2.6.0.Final</version.thorntail>
 	</properties>
 
@@ -36,17 +34,29 @@
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
-
 		<plugins>
 			<plugin>
 				<groupId>io.thorntail</groupId>
 				<artifactId>thorntail-maven-plugin</artifactId>
 				<version>${version.thorntail}</version>
-
 				<executions>
 					<execution>
 						<goals>
 							<goal>package</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -61,12 +71,16 @@
 							<goal>integration-test</goal>
 							<goal>verify</goal>
 						</goals>
+						<configuration>
+							<environmentVariables>
+								<thorntail.arquillian.daemon.port>28080</thorntail.arquillian.daemon.port>
+							</environmentVariables>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.thorntail</groupId>
@@ -91,10 +105,6 @@
 		</dependency>
 		<dependency>
 			<groupId>io.thorntail</groupId>
-			<artifactId>swagger</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.thorntail</groupId>
 			<artifactId>swagger-webapp</artifactId>
 		</dependency>
 		<dependency>
@@ -115,16 +125,18 @@
 			<artifactId>arquillian</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>fluent</artifactId>
-			<scope>test</scope>
-		</dependency>
- -->
+		<!-- <dependency> <groupId>org.apache.httpcomponents</groupId> <artifactId>fluent</artifactId> 
+			<scope>test</scope> </dependency> -->
 
 		<dependency>
 			<groupId>io.thorntail</groupId>
 			<artifactId>microprofile-restclient</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>3.3.3</version>
 			<scope>test</scope>
 		</dependency>
 

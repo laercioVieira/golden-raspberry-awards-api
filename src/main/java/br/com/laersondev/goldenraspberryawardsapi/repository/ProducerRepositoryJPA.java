@@ -23,7 +23,7 @@ public class ProducerRepositoryJpa extends AbstractBaseCrudRepository<Producer, 
 	}
 
 	@Override
-	public List<ProducerMovieWinRs> findProducersWithWinMoviesAtLeastTwice() {
+	public List<ProducerMovieWinRs> findProducersWithWinMoviesAtLeastTwiceOrdened() {
 		return getEntityManager() //
 				.createNamedQuery("ProducerMovieWinRs.findProducersWithWinMoviesAtLeastTwice", ProducerMovieWinRs.class)
 				.getResultList();

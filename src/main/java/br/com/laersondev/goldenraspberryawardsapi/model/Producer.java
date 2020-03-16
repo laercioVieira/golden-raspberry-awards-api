@@ -13,14 +13,13 @@ import javax.persistence.UniqueConstraint;
 import br.com.laersondev.goldenraspberryawardsapi.util.Precondition;
 
 @Entity
-@Table(name = "producer", uniqueConstraints=@UniqueConstraint(columnNames = {"name"}))
-public class Producer implements Serializable,
-br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer>{
+@Table(name = "producer", uniqueConstraints = @UniqueConstraint(columnNames = { "name" }))
+public class Producer implements Serializable, br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int id;
 
@@ -30,10 +29,12 @@ br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer>{
 	public Producer() {
 		super();
 	}
-	public Producer(String name) {
+
+	public Producer(final String name) {
 		this(0, name);
 	}
-	public Producer(int id, String name) {
+
+	public Producer(final int id, final String name) {
 		super();
 		this.setId(id);
 		this.setName(name);
@@ -44,7 +45,7 @@ br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer>{
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = Precondition.checkIfPositive(id, "id");
 	}
 
@@ -52,7 +53,7 @@ br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer>{
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = Precondition.checkIfNotBlank(name, "name");
 	}
 
@@ -70,9 +71,9 @@ br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer>{
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj instanceof Producer) {
-			return getId() == ((Producer) obj).getId();
+			return this.getId() == ((Producer) obj).getId();
 		}
 
 		return false;

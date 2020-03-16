@@ -26,13 +26,13 @@ import javax.persistence.UniqueConstraint;
 import br.com.laersondev.goldenraspberryawardsapi.dto.MovieDto;
 
 @Entity
-@Table(name = "movie", uniqueConstraints=@UniqueConstraint(columnNames = {"title"}))
+@Table(name = "movie", uniqueConstraints = @UniqueConstraint(columnNames = { "title" }))
 public class Movie implements Serializable, br.com.laersondev.goldenraspberryawardsapi.model.Entity<Integer> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int id;
 
@@ -42,15 +42,15 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 	@Column(name = "year")
 	private int year;
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinTable(name = "movie_studio", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "studio_id") })
-	private Set<Studio> studios;
+	private final Set<Studio> studios;
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinTable(name = "movie_producer", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "producer_id") })
-	private Set<Producer> producers;
+	private final Set<Producer> producers;
 
 	@Column(name = "winner")
 	private boolean winner;
@@ -61,7 +61,7 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 		this.producers = new HashSet<>();
 	}
 
-	public Movie(int id, String title, int year, boolean winner) {
+	public Movie(final int id, final String title, final int year, final boolean winner) {
 		super();
 		this.setId(id);
 		this.setTitle(title);
@@ -88,19 +88,19 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 		this.setTitle(dto.getTitle());
 		this.setYear(dto.getYear());
 
-		getStudios().removeIf(mystd -> !dto.getStudios().contains(mystd.getName()));
+		this.getStudios().removeIf(mystd -> !dto.getStudios().contains(mystd.getName()));
 		final Set<String> studioNames = this.getStudioNames();
 		dto.getStudios().forEach(studio -> {
-			if(!studioNames.contains(studio)) {
-				getStudios().add(new Studio(studio));
+			if (!studioNames.contains(studio)) {
+				this.getStudios().add(new Studio(studio));
 			}
 		});
 
-		getProducers().removeIf(myProd -> !dto.getProducers().contains(myProd.getName()));
+		this.getProducers().removeIf(myProd -> !dto.getProducers().contains(myProd.getName()));
 		final Set<String> producerNames = this.getProducerNames();
 		dto.getProducers().forEach(producer -> {
-			if(!producerNames.contains(producer)) {
-				getProducers().add(new Producer(producer));
+			if (!producerNames.contains(producer)) {
+				this.getProducers().add(new Producer(producer));
 			}
 		});
 
@@ -135,7 +135,7 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 		return this.getStudios().stream().map(Studio::getName).collect(Collectors.toSet());
 	}
 
-	public void addStudios(Collection<Studio> studios) {
+	public void addStudios(final Collection<Studio> studios) {
 		this.studios.addAll(checkIfNotNull(studios, "studios"));
 	}
 
@@ -147,7 +147,7 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 		return this.getProducers().stream().map(Producer::getName).collect(Collectors.toSet());
 	}
 
-	public void addProducers(Collection<Producer> producers) {
+	public void addProducers(final Collection<Producer> producers) {
 		this.producers.addAll(checkIfNotNull(producers, "producers"));
 	}
 
@@ -155,7 +155,7 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 		return this.winner;
 	}
 
-	public void setWinner(boolean winner) {
+	public void setWinner(final boolean winner) {
 		this.winner = winner;
 	}
 
@@ -168,9 +168,9 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj instanceof Movie) {
-			return getId() == ((Movie) obj).getId();
+			return this.getId() == ((Movie) obj).getId();
 		}
 
 		return false;
@@ -180,11 +180,12 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 	public String toString() {
 		final int maxLen = 5;
 		return "Movie [id=" + this.id + ", title=" + this.title + ", year=" + this.year + ", studios="
-		+ (this.studios != null ? toString(this.studios, maxLen) : null) + ", producers="
-		+ (this.producers != null ? toString(this.producers, maxLen) : null) + ", winner=" + this.winner + "]";
+				+ (this.studios != null ? this.toString(this.studios, maxLen) : null) + ", producers="
+				+ (this.producers != null ? this.toString(this.producers, maxLen) : null) + ", winner=" + this.winner
+				+ "]";
 	}
 
-	private String toString(Collection<?> collection, int maxLen) {
+	private String toString(final Collection<?> collection, final int maxLen) {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("[");
 		int i = 0;
@@ -194,7 +195,7 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 			}
 			builder.append(iterator.next());
 		}
-		if(collection.size() > maxLen) {
+		if (collection.size() > maxLen) {
 			builder.append(" ...");
 		}
 		builder.append("]");

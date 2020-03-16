@@ -35,7 +35,7 @@ public class ProducerService {
 		super();
 	}
 
-	public Set<Producer> findOrCreate(Set<String> producers) {
+	public Set<Producer> findOrCreate(final Set<String> producers) {
 		return checkIfNotNull(producers, "producers").stream()//
 				.map(producer -> this.repository.findByName(producer)//
 						.orElseGet(() -> this.repository.save(new Producer(producer))))
@@ -43,20 +43,22 @@ public class ProducerService {
 	}
 
 	public RangeProducerAwards getRangeProducerAwards() {
-		final List<ProducerMovieWinRs> winMoviesAtLeastTwice = this.repository.findProducersWithWinMoviesAtLeastTwice();
-		final List<ProducerAwardDetail> producerAwardsDts = makeProducersAwardsDetailsWithInterval(winMoviesAtLeastTwice);
+		final List<ProducerMovieWinRs> winMoviesAtLeastTwice = this.repository.findProducersWithWinMoviesAtLeastTwiceOrdened();
+		final List<ProducerAwardDetail> producerAwardsDts = this.makeProducersAwardsDetailsWithInterval(winMoviesAtLeastTwice);
 
 		final Comparator<ProducerAwardDetail> compareByInterval = Comparator.comparingInt(ProducerAwardDetail::getInterval);
-		final Predicate<? super ProducerAwardDetail> intervalGreaterThanZero = prodToFilter -> prodToFilter.getInterval() > 0;
+		final Predicate<? super ProducerAwardDetail> intervalGreaterThanZero = prodToFilter -> prodToFilter.getInterval() >= 0;
 		final Optional<ProducerAwardDetail> min = producerAwardsDts.stream().filter(intervalGreaterThanZero).min(compareByInterval);
 		final Optional<ProducerAwardDetail> max = producerAwardsDts.stream().filter(intervalGreaterThanZero).max(compareByInterval);
 
 		final RangeProducerAwards rangeProducerAwards = new RangeProducerAwards();
 		min.ifPresent(minProducer -> {//
-			rangeProducerAwards.getMin().addAll(producerWihSameInterval(producerAwardsDts, minProducer).collect(toSet()));
+			rangeProducerAwards.getMin()
+			.addAll(this.producerWihSameInterval(producerAwardsDts, minProducer).collect(toSet()));
 		});
 		max.ifPresent(maxProducer -> {//
-			rangeProducerAwards.getMax().addAll(producerWihSameInterval(producerAwardsDts, maxProducer).collect(toSet()));
+			rangeProducerAwards.getMax()
+			.addAll(this.producerWihSameInterval(producerAwardsDts, maxProducer).collect(toSet()));
 		});
 
 		return rangeProducerAwards;
@@ -75,7 +77,7 @@ public class ProducerService {
 						producerAwardDetailBefore.getFollowingWin(), //
 						producerMovieWinRs.getMovieYear());
 			} else {
-				producerAwardDetail = new ProducerAwardDetail(producerMovieWinRs.getProducerName(), 0, null,
+				producerAwardDetail = new ProducerAwardDetail(producerMovieWinRs.getProducerName(), -1, null,
 						producerMovieWinRs.getMovieYear());
 			}
 			producerAwardDetailBefore = producerAwardDetail;
@@ -85,8 +87,8 @@ public class ProducerService {
 	}
 
 	private Stream<ProducerAwardDetail> producerWihSameInterval(final List<ProducerAwardDetail> producerWinn,
-			ProducerAwardDetail otherProducer) {
-		return producerWinn.stream().filter( prod -> prod.getInterval() == otherProducer.getInterval() );
+			final ProducerAwardDetail otherProducer) {
+		return producerWinn.stream().filter(prod -> prod.getInterval() == otherProducer.getInterval());
 	}
 
 	private <T, R> R tryDo(final Function<T, R> action, final T params) {
