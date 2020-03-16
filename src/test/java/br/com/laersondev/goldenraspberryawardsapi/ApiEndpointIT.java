@@ -62,6 +62,7 @@ public class ApiEndpointIT {
 
 	@Test
 	@InSequence(value = 1)
+	@RunAsClient
 	public void testGetRangeProducerAwards(final @Context UriInfo uriInfo) throws IOException {
 
 		System.out.println(uriInfo.getBaseUri());
@@ -98,6 +99,7 @@ public class ApiEndpointIT {
 
 	@Test
 	@InSequence(value = 2)
+	@RunAsClient
 	public void testSaveMovie() throws IOException {
 		final Set<String> studios = new HashSet<>(Arrays.asList("Studio 1","Studio 2"));
 		final Set<String> producers = new HashSet<>(Arrays.asList("Producer 1","Producer 2"));
@@ -123,6 +125,7 @@ public class ApiEndpointIT {
 
 	@Test
 	@InSequence(value = 3)
+	@RunAsClient
 	public void testDeleteMovie() throws IOException {
 
 		final MovieDto movieDeleted = this.client.target(HTTP_BASE_PATH_MOVIE + "/" + this.movieCreated.getId() ).request()//
