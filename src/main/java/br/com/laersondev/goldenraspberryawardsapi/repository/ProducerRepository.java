@@ -10,7 +10,6 @@ import br.com.laersondev.goldenraspberryawardsapi.repository.dto.ProducerMovieWi
 
 public interface ProducerRepository extends BaseCrudRepository<Producer, Integer> {
 
-	//@Query(nativeQuery = true, name = "ProducerMovieWinRs.findProducersWithWinMoviesAtLeastTwice")
 	List<ProducerMovieWinRs> findProducersWithWinMoviesAtLeastTwiceOrdened();
 
 	Optional<Producer> findByName(final String name );

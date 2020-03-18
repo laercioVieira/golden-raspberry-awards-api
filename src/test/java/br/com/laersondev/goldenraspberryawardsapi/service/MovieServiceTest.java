@@ -104,8 +104,7 @@ public class MovieServiceTest {
 
 	@Test()
 	public void testDeleteFailWithIdNotFound() {
-		this.notFoundExpectedExe.expect(ServiceException.class);
-		this.notFoundExpectedExe.expectCause(instanceOf(MovieNotFoundException.class));
+		this.notFoundExpectedExe.expect(MovieNotFoundException.class);
 
 		Mockito.when(this.movieRepository.findById(ID_1)).thenReturn(Optional.empty());
 		assertNull(this.movieService.delete(ID_1));

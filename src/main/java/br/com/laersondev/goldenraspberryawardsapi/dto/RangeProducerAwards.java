@@ -34,7 +34,7 @@ public class RangeProducerAwards implements Serializable {
 		+ (this.max != null ? toString(this.max, maxLen) : null) + "]";
 	}
 
-	private String toString(Collection<?> collection, int maxLen) {
+	private String toString(final Collection<?> collection, final int maxLen) {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("[");
 		int i = 0;
@@ -46,6 +46,14 @@ public class RangeProducerAwards implements Serializable {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public void setMin(final Set<ProducerAwardDetail> min) {
+		this.min = min;
+	}
+
+	public void setMax(final Set<ProducerAwardDetail> max) {
+		this.max = max;
 	}
 
 }

@@ -18,7 +18,7 @@ public class ProducerAwardDetail implements Serializable {
 		super();
 	}
 
-	public ProducerAwardDetail(String producer, int interval, Integer previousWin, Integer followingWin) {
+	public ProducerAwardDetail(final String producer, final int interval, final Integer previousWin, final Integer followingWin) {
 		super();
 		this.producer = producer;
 		this.interval = interval;
@@ -40,6 +40,22 @@ public class ProducerAwardDetail implements Serializable {
 
 	public Integer getFollowingWin() {
 		return this.followingWin;
+	}
+
+	public void setProducer(final String producer) {
+		this.producer = producer;
+	}
+
+	public void setInterval(final int interval) {
+		this.interval = interval;
+	}
+
+	public void setPreviousWin(final Integer previousWin) {
+		this.previousWin = previousWin;
+	}
+
+	public void setFollowingWin(final Integer followingWin) {
+		this.followingWin = followingWin;
 	}
 
 	@Override

@@ -180,9 +180,9 @@ public class Movie implements Serializable, br.com.laersondev.goldenraspberryawa
 	public String toString() {
 		final int maxLen = 5;
 		return "Movie [id=" + this.id + ", title=" + this.title + ", year=" + this.year + ", studios="
-				+ (this.studios != null ? this.toString(this.studios, maxLen) : null) + ", producers="
-				+ (this.producers != null ? this.toString(this.producers, maxLen) : null) + ", winner=" + this.winner
-				+ "]";
+		+ (this.studios != null ? this.toString(this.studios, maxLen) : null) + ", producers="
+		+ (this.producers != null ? this.toString(this.producers, maxLen) : null) + ", winner=" + this.winner
+		+ "]";
 	}
 
 	private String toString(final Collection<?> collection, final int maxLen) {

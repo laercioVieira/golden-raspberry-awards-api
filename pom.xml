@@ -18,6 +18,8 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
 		<version.thorntail>2.6.0.Final</version.thorntail>
+		<version.resteasy>3.9.1.Final</version.resteasy>
+    	<version.h2>1.4.200</version.h2>
 	</properties>
 
 	<dependencyManagement>
@@ -34,6 +36,12 @@
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>io.thorntail</groupId>
@@ -46,15 +54,8 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>start</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
 						<id>stop</id>
-						<phase>post-integration-test</phase>
+						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>stop</goal>
 						</goals>
@@ -72,9 +73,9 @@
 							<goal>verify</goal>
 						</goals>
 						<configuration>
-							<environmentVariables>
-								<thorntail.arquillian.daemon.port>28080</thorntail.arquillian.daemon.port>
-							</environmentVariables>
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
 						</configuration>
 					</execution>
 				</executions>
@@ -86,6 +87,16 @@
 			<groupId>io.thorntail</groupId>
 			<artifactId>jaxrs</artifactId>
 		</dependency>
+		<dependency>
+	      <groupId>io.thorntail</groupId>
+	      <artifactId>jaxrs-jsonb</artifactId>
+	    </dependency>
+		<dependency>
+	      <groupId>org.jboss.resteasy</groupId>
+	      <artifactId>resteasy-json-binding-provider</artifactId>
+	      <version>${version.resteasy}</version>
+	      <scope>test</scope>
+	    </dependency>
 		<dependency>
 			<groupId>io.thorntail</groupId>
 			<artifactId>microprofile-health</artifactId>
@@ -101,7 +112,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.200</version>
+			<version>${version.h2}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.thorntail</groupId>
@@ -117,17 +128,9 @@
 		</dependency>
 		<dependency>
 			<groupId>io.thorntail</groupId>
-			<artifactId>thorntail-runner</artifactId>
-			<version>${version.thorntail}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.thorntail</groupId>
 			<artifactId>arquillian</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency> <groupId>org.apache.httpcomponents</groupId> <artifactId>fluent</artifactId> 
-			<scope>test</scope> </dependency> -->
-
 		<dependency>
 			<groupId>io.thorntail</groupId>
 			<artifactId>microprofile-restclient</artifactId>

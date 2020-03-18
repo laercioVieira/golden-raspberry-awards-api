@@ -38,11 +38,11 @@ public class MovieService {
 	}
 
 	public Movie delete(final int movieId) {
-		return this.tryDo(movId -> {
-			final Movie movie = getByIdRequired(movieId);
+		final Movie movieFound = getByIdRequired(movieId);
+		return this.tryDo(movie -> {
 			this.repository.delete(movie);
 			return movie;
-		}, movieId);
+		}, movieFound);
 	}
 
 	@Transactional(TxType.REQUIRED)
