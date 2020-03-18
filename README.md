@@ -39,12 +39,8 @@ O projeto utiliza tecnologias e bibliotecas do ecossistema Java ;)
     <code>
       mvn thorntail:run
     </code>
-
-    Ou Rodar diretamente:
-  </br> 
-   Para isso execute o arquivo "run.bat" (para windows) ou "run.sh" (linux);
-
-    Após isso a aplicação (Api) estará disponivel sob a contexto em: http://localhost:8080/api
+    
+    	Após isso a aplicação (Api) estará disponivel sob a contexto em: http://localhost:8080/api
 
 - Você pode testar utilizando o swagger-ui embutido em: http://localhost:8080/swagger-ui, No campo <b>"Explore"</b> coloque <b>"/openapi"</b> e tecle "Enter" para que a interface carregue a api.
 <br/>
